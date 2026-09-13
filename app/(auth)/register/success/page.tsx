@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -21,10 +21,47 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 // ============================================
-// COMPONENT
+// PAGE WRAPPER (provides Suspense boundary)
 // ============================================
 
 export default function RegistrationSuccessPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <RegistrationSuccessContent />
+    </Suspense>
+  );
+}
+
+// ============================================
+// LOADING FALLBACK
+// ============================================
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 py-12">
+      <div className="w-full max-w-2xl">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+          <div className="bg-linear-to-r from-akoma-green to-green-700 p-8 text-center text-white">
+            <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4 animate-pulse" />
+            <div className="h-8 w-64 bg-white/20 rounded mx-auto mb-2 animate-pulse" />
+            <div className="h-4 w-80 bg-white/20 rounded mx-auto animate-pulse" />
+          </div>
+          <div className="p-6 md:p-8 space-y-4">
+            <div className="h-24 bg-gray-100 rounded-xl animate-pulse" />
+            <div className="h-16 bg-gray-100 rounded-xl animate-pulse" />
+            <div className="h-16 bg-gray-100 rounded-xl animate-pulse" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================
+// MAIN CONTENT (uses useSearchParams)
+// ============================================
+
+function RegistrationSuccessContent() {
   const searchParams = useSearchParams();
   const [applicationId, setApplicationId] = useState<string>('');
   const [schoolName, setSchoolName] = useState<string>('');
