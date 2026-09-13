@@ -1,0 +1,161 @@
+@import "tailwindcss";
+
+/* Import shadcn/ui styles if using */
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* Akoma Edu Custom Colors */
+  --color-akoma-green: #0B6B4F;
+  --color-akoma-dark: #07513C;
+  --color-akoma-gold: #E5A823;
+  --color-akoma-light: #16855B;
+  
+  --color-background: #F7F9F8;
+  --color-background-white: #FFFFFF;
+  
+  --color-text: #17201D;
+  --color-text-secondary: #66736D;
+  
+  --color-success: #16855B;
+  --color-warning: #D99000;
+  --color-error: #D64545;
+  --color-info: #3478B5;
+
+  /* Default theme variables */
+  --color-foreground: var(--color-text);
+  --color-border: var(--color-gray-200);
+  --color-input: var(--color-gray-200);
+  --color-ring: var(--color-akoma-green);
+  
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+
+  /* Font */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: #F7F9F8;
+  --foreground: #17201D;
+  --card: #FFFFFF;
+  --card-foreground: #17201D;
+  --popover: #FFFFFF;
+  --popover-foreground: #17201D;
+  --primary: #0B6B4F;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F7F9F8;
+  --secondary-foreground: #17201D;
+  --muted: #F7F9F8;
+  --muted-foreground: #66736D;
+  --accent: #0B6B4F;
+  --accent-foreground: #FFFFFF;
+  --destructive: #D64545;
+  --destructive-foreground: #FFFFFF;
+  --border: #E5E7EB;
+  --input: #E5E7EB;
+  --ring: #0B6B4F;
+  --chart-1: #0B6B4F;
+  --chart-2: #E5A823;
+  --chart-3: #16855B;
+  --chart-4: #3478B5;
+  --chart-5: #D99000;
+}
+
+.dark {
+  --background: #17201D;
+  --foreground: #F7F9F8;
+  --card: #1E2A25;
+  --card-foreground: #F7F9F8;
+  --popover: #1E2A25;
+  --popover-foreground: #F7F9F8;
+  --primary: #0B6B4F;
+  --primary-foreground: #FFFFFF;
+  --secondary: #1E2A25;
+  --secondary-foreground: #F7F9F8;
+  --muted: #1E2A25;
+  --muted-foreground: #8A9B94;
+  --accent: #0B6B4F;
+  --accent-foreground: #FFFFFF;
+  --destructive: #D64545;
+  --destructive-foreground: #FFFFFF;
+  --border: #2A3A34;
+  --input: #2A3A34;
+  --ring: #0B6B4F;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+}
+
+/* Custom utility classes for Akoma colors */
+@layer utilities {
+  .bg-akoma-green {
+    background-color: #0B6B4F;
+  }
+  .bg-akoma-dark {
+    background-color: #07513C;
+  }
+  .bg-akoma-gold {
+    background-color: #E5A823;
+  }
+  .bg-akoma-light {
+    background-color: #16855B;
+  }
+  .bg-akoma-green\/10 {
+    background-color: rgba(11, 107, 79, 0.1);
+  }
+  .bg-akoma-gold\/10 {
+    background-color: rgba(229, 168, 35, 0.1);
+  }
+  
+  .text-akoma-green {
+    color: #0B6B4F;
+  }
+  .text-akoma-dark {
+    color: #07513C;
+  }
+  .text-akoma-gold {
+    color: #E5A823;
+  }
+  .text-akoma-light {
+    color: #16855B;
+  }
+  
+  .border-akoma-green {
+    border-color: #0B6B4F;
+  }
+  .border-akoma-gold {
+    border-color: #E5A823;
+  }
+  
+  .hover\:bg-akoma-dark:hover {
+    background-color: #07513C;
+  }
+  .hover\:bg-akoma-green\/5:hover {
+    background-color: rgba(11, 107, 79, 0.05);
+  }
+  .hover\:bg-akoma-green\/20:hover {
+    background-color: rgba(11, 107, 79, 0.2);
+  }
+  .hover\:bg-akoma-gold\/90:hover {
+    background-color: rgba(229, 168, 35, 0.9);
+  }
+  .hover\:text-akoma-green:hover {
+    color: #0B6B4F;
+  }
+  .hover\:border-akoma-green\/10:hover {
+    border-color: rgba(11, 107, 79, 0.1);
+  }
+}
