@@ -17,6 +17,10 @@ import {
   Eye,
   RefreshCw,
   Inbox,
+  CalendarClock,
+  Play,
+  Ban,
+  ListChecks,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,51 +29,71 @@ import {
 } from '@/lib/services/schoolAdminService';
 
 // ============================================
-// HELPERS
+// TYPES
 // ============================================
 
-type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected' | 'waitlisted' | 'withdrawn';
+type StatusFilter =
+  | 'all'
+  | 'pending'
+  | 'under_review'
+  | 'exam_scheduled'
+  | 'exam_completed'
+  | 'waitlisted'
+  | 'approved'
+  | 'rejected'
+  | 'withdrawn';
 
 const STATUS_TABS: { key: StatusFilter; label: string }[] = [
   { key: 'pending', label: 'Pending' },
+  { key: 'under_review', label: 'Under Review' },
+  { key: 'exam_scheduled', label: 'Exam Scheduled' },
+  { key: 'exam_completed', label: 'Exam Completed' },
+  { key: 'waitlisted', label: 'Waitlisted' },
   { key: 'approved', label: 'Approved' },
   { key: 'rejected', label: 'Rejected' },
   { key: 'all', label: 'All' },
 ];
 
+const STATUS_LABELS: Record<string, string> = {
+  pending: 'Pending',
+  under_review: 'Under Review',
+  exam_scheduled: 'Exam Scheduled',
+  exam_completed: 'Exam Completed',
+  interview_scheduled: 'Interview',
+  interview_completed: 'Interview Done',
+  document_required: 'Docs Required',
+  documents_submitted: 'Docs Submitted',
+  waitlisted: 'Waitlisted',
+  approved: 'Approved',
+  rejected: 'Rejected',
+  withdrawn: 'Withdrawn',
+};
+
+// ============================================
+// HELPERS
+// ============================================
+
 function StatusBadge({ status }: { status: AdmissionApplicationSummary['status'] }) {
   const config: Record<string, { classes: string; icon: React.ReactNode }> = {
-    pending: {
-      classes: 'bg-amber-100 text-amber-700',
-      icon: <Clock className="h-3 w-3" />,
-    },
-    approved: {
-      classes: 'bg-green-100 text-green-700',
-      icon: <CheckCircle2 className="h-3 w-3" />,
-    },
-    rejected: {
-      classes: 'bg-red-100 text-red-700',
-      icon: <XCircle className="h-3 w-3" />,
-    },
-    waitlisted: {
-      classes: 'bg-blue-100 text-blue-700',
-      icon: <Clock className="h-3 w-3" />,
-    },
-    withdrawn: {
-      classes: 'bg-gray-100 text-gray-700',
-      icon: <XCircle className="h-3 w-3" />,
-    },
+    pending: { classes: 'bg-amber-100 text-amber-700', icon: <Clock className="h-3 w-3" /> },
+    under_review: { classes: 'bg-indigo-100 text-indigo-700', icon: <Play className="h-3 w-3" /> },
+    exam_scheduled: { classes: 'bg-blue-100 text-blue-700', icon: <CalendarClock className="h-3 w-3" /> },
+    exam_completed: { classes: 'bg-cyan-100 text-cyan-700', icon: <ListChecks className="h-3 w-3" /> },
+    interview_scheduled: { classes: 'bg-blue-100 text-blue-700', icon: <CalendarClock className="h-3 w-3" /> },
+    interview_completed: { classes: 'bg-cyan-100 text-cyan-700', icon: <ListChecks className="h-3 w-3" /> },
+    document_required: { classes: 'bg-orange-100 text-orange-700', icon: <AlertCircle className="h-3 w-3" /> },
+    documents_submitted: { classes: 'bg-lime-100 text-lime-700', icon: <CheckCircle2 className="h-3 w-3" /> },
+    approved: { classes: 'bg-green-100 text-green-700', icon: <CheckCircle2 className="h-3 w-3" /> },
+    rejected: { classes: 'bg-red-100 text-red-700', icon: <XCircle className="h-3 w-3" /> },
+    waitlisted: { classes: 'bg-slate-100 text-slate-700', icon: <Clock className="h-3 w-3" /> },
+    withdrawn: { classes: 'bg-gray-100 text-gray-700', icon: <Ban className="h-3 w-3" /> },
   };
 
   const c = config[status] || config.pending;
-  const label = status.charAt(0).toUpperCase() + status.slice(1);
-
   return (
-    <span
-      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${c.classes}`}
-    >
+    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${c.classes}`}>
       {c.icon}
-      {label}
+      {STATUS_LABELS[status] || status}
     </span>
   );
 }
@@ -107,9 +131,10 @@ export default function StudentApplicationsPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
   const limit = 10;
 
-  // Reset page when filters change
+  // Reset page on filter change
   useEffect(() => {
     setPage(1);
   }, [statusFilter, searchQuery]);
@@ -144,7 +169,7 @@ export default function StudentApplicationsPage() {
     return () => {
       mounted = false;
     };
-  }, [statusFilter, searchQuery, page]);
+  }, [statusFilter, searchQuery, page, refreshKey]);
 
   return (
     <div className="space-y-6">
@@ -161,7 +186,7 @@ export default function StudentApplicationsPage() {
         </div>
         <Button
           variant="outline"
-          onClick={() => setPage((p) => p)}
+          onClick={() => setRefreshKey((k) => k + 1)}
           className="gap-2 w-fit"
         >
           <RefreshCw className="h-4 w-4" />
@@ -172,8 +197,8 @@ export default function StudentApplicationsPage() {
       {/* Filters card */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
         {/* Tabs */}
-        <div className="border-b border-gray-100 px-4 md:px-6">
-          <div className="flex gap-1 overflow-x-auto">
+        <div className="border-b border-gray-100 px-4 md:px-6 overflow-x-auto">
+          <div className="flex gap-1 min-w-max">
             {STATUS_TABS.map((tab) => (
               <button
                 key={tab.key}
@@ -206,9 +231,7 @@ export default function StudentApplicationsPage() {
             <p className="text-sm text-text-secondary mt-3">
               {total === 0
                 ? 'No applications found'
-                : `Showing ${applications.length} of ${total} application${
-                    total === 1 ? '' : 's'
-                  }`}
+                : `Showing ${applications.length} of ${total} application${total === 1 ? '' : 's'}`}
             </p>
           )}
         </div>
@@ -224,7 +247,7 @@ export default function StudentApplicationsPage() {
         <div className="bg-white rounded-2xl border border-red-100 shadow-sm p-12 text-center">
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-3" />
           <p className="text-red-600 mb-4">{error}</p>
-          <Button variant="outline" onClick={() => setPage((p) => p)} className="gap-2">
+          <Button variant="outline" onClick={() => setRefreshKey((k) => k + 1)} className="gap-2">
             <RefreshCw className="h-4 w-4" />
             Retry
           </Button>
@@ -273,14 +296,10 @@ export default function StudentApplicationsPage() {
                       <p className="text-xs text-text-secondary">{app.parentEmail}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-sm text-text">
-                        {formatLevel(app.desiredLevel)}
-                      </span>
+                      <span className="text-sm text-text">{formatLevel(app.desiredLevel)}</span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-sm text-text-secondary">
-                        {formatDate(app.createdAt)}
-                      </span>
+                      <span className="text-sm text-text-secondary">{formatDate(app.createdAt)}</span>
                     </td>
                     <td className="px-6 py-4">
                       <StatusBadge status={app.status} />
@@ -323,9 +342,7 @@ export default function StudentApplicationsPage() {
                     Parent: {app.parentFirstName} {app.parentLastName}
                   </p>
                   <p className="text-xs truncate">{app.parentEmail}</p>
-                  <p className="text-xs mt-1">
-                    Submitted {formatDate(app.createdAt)}
-                  </p>
+                  <p className="text-xs mt-1">Submitted {formatDate(app.createdAt)}</p>
                 </div>
               </Link>
             ))}

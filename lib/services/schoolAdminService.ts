@@ -443,6 +443,10 @@ export async function getStudentResults() {
 // ADMISSION APPLICATIONS (School Admin)
 // ============================================
 
+// ============================================
+// ADMISSION APPLICATIONS (School Admin)
+// ============================================
+
 export interface AdmissionApplicationSummary {
   id: string;
   schoolId: string;
@@ -458,7 +462,44 @@ export interface AdmissionApplicationSummary {
   desiredLevel: string;
   previousSchool: string | null;
   notes: string | null;
-  status: 'pending' | 'approved' | 'rejected' | 'waitlisted' | 'withdrawn';
+
+  // ✅ Extended status — now supports all stages
+  status:
+    | 'pending'
+    | 'under_review'
+    | 'exam_scheduled'
+    | 'exam_completed'
+    | 'interview_scheduled'
+    | 'interview_completed'
+    | 'document_required'
+    | 'documents_submitted'
+    | 'waitlisted'
+    | 'approved'
+    | 'rejected'
+    | 'withdrawn';
+
+  // ✅ NEW: who acts next
+  nextActionBy: 'parent' | 'school';
+
+  // ✅ NEW: exam scheduling
+  examDate: string | null;
+  examVenue: string | null;
+  examNotes: string | null;
+  examScore: number | null;
+  examResult: 'pending' | 'passed' | 'failed' | null;
+
+  // ✅ NEW: stage history
+  stageHistory: Array<{
+    stage: string;
+    at: string;
+    by: string;
+    meta?: Record<string, any>;
+  }>;
+
+  // ✅ NEW: waitlist reason
+  waitlistReason: string | null;
+
+  // Existing review fields
   reviewNotes: string | null;
   rejectionReason: string | null;
   createdAt: string;
@@ -481,7 +522,19 @@ export interface AdmissionApplicationsResponse {
 export async function getStudentApplications(params?: {
   page?: number;
   limit?: number;
-  status?: 'pending' | 'approved' | 'rejected' | 'waitlisted' | 'withdrawn';
+  status?:
+    | 'pending'
+    | 'under_review'
+    | 'exam_scheduled'
+    | 'exam_completed'
+    | 'interview_scheduled'
+    | 'interview_completed'
+    | 'document_required'
+    | 'documents_submitted'
+    | 'waitlisted'
+    | 'approved'
+    | 'rejected'
+    | 'withdrawn';
   search?: string;
 }): Promise<AdmissionApplicationsResponse> {
   try {
@@ -550,6 +603,90 @@ export async function rejectStudentApplication(
     return response.data.data;
   } catch (error: any) {
     console.error('Reject student application error:', error.response?.data || error.message);
+    throw error;
+  }
+}
+
+// ============================================
+// ADMISSION APPLICATIONS — STAGE TRANSITIONS
+// ============================================
+
+/**
+ * Mark an application as under review
+ */
+export async function markApplicationUnderReview(
+  applicationId: string,
+  notes?: string
+): Promise<{ application: AdmissionApplicationSummary; message: string }> {
+  try {
+    const response = await api.put(
+      `/school/student-applications/${applicationId}/under-review`,
+      { notes }
+    );
+    return response.data.data;
+  } catch (error: any) {
+    console.error('Mark under review error:', error.response?.data || error.message);
+    throw error;
+  }
+}
+
+/**
+ * Schedule an entrance exam for an application
+ */
+export async function scheduleApplicationExam(
+  applicationId: string,
+  data: { examDate: string; examVenue: string; examNotes?: string }
+): Promise<{ application: AdmissionApplicationSummary; message: string }> {
+  try {
+    const response = await api.put(
+      `/school/student-applications/${applicationId}/schedule-exam`,
+      data
+    );
+    return response.data.data;
+  } catch (error: any) {
+    console.error('Schedule exam error:', error.response?.data || error.message);
+    throw error;
+  }
+}
+
+/**
+ * Record the result of an entrance exam
+ */
+export async function recordApplicationExamResult(
+  applicationId: string,
+  data: {
+    examScore?: number;
+    examResult: 'passed' | 'failed';
+    notes?: string;
+  }
+): Promise<{ application: AdmissionApplicationSummary; message: string }> {
+  try {
+    const response = await api.put(
+      `/school/student-applications/${applicationId}/exam-result`,
+      data
+    );
+    return response.data.data;
+  } catch (error: any) {
+    console.error('Record exam result error:', error.response?.data || error.message);
+    throw error;
+  }
+}
+
+/**
+ * Move an application to the waitlist
+ */
+export async function waitlistApplication(
+  applicationId: string,
+  reason?: string
+): Promise<{ application: AdmissionApplicationSummary; message: string }> {
+  try {
+    const response = await api.put(
+      `/school/student-applications/${applicationId}/waitlist`,
+      { reason }
+    );
+    return response.data.data;
+  } catch (error: any) {
+    console.error('Waitlist application error:', error.response?.data || error.message);
     throw error;
   }
 }

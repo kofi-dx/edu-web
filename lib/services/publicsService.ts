@@ -62,6 +62,7 @@ export interface AdmissionApplicationInput {
   notes?: string;
 }
 
+// ✅ Extended with all stage fields
 export interface AdmissionApplication {
   id: string;
   schoolId: string;
@@ -71,12 +72,52 @@ export interface AdmissionApplication {
   studentFirstName: string;
   studentLastName: string;
   desiredLevel: string;
-  status: 'pending' | 'approved' | 'rejected' | 'waitlisted' | 'withdrawn';
+
+  status:
+    | 'pending'
+    | 'under_review'
+    | 'exam_scheduled'
+    | 'exam_completed'
+    | 'interview_scheduled'
+    | 'interview_completed'
+    | 'document_required'
+    | 'documents_submitted'
+    | 'waitlisted'
+    | 'approved'
+    | 'rejected'
+    | 'withdrawn';
+
+  nextActionBy: 'parent' | 'school';
+
+  // Exam scheduling
+  examDate: string | null;
+  examVenue: string | null;
+  examNotes: string | null;
+  examScore: number | null;
+  examResult: 'pending' | 'passed' | 'failed' | null;
+
+  // Stage history
+  stageHistory: Array<{
+    stage: string;
+    at: string;
+    by: string;
+    meta?: Record<string, any>;
+  }>;
+
+  // Waitlist
+  waitlistReason: string | null;
+
+  // Review
   reviewNotes?: string | null;
   rejectionReason?: string | null;
+
+  // Timestamps
   createdAt: string;
   reviewedAt?: string | null;
+
+  // Approval result
   approvedClassId?: string | null;
+
   school?: {
     id: string;
     name: string;
@@ -93,7 +134,6 @@ export interface AdmissionApplication {
 
 /**
  * List all active public schools with optional filters
- * Public endpoint — no auth required.
  */
 export async function getPublicSchools(params?: {
   page?: number;
@@ -114,7 +154,6 @@ export async function getPublicSchools(params?: {
 
 /**
  * Get a single public school's detail (including aggregate stats)
- * Public endpoint — no auth required.
  */
 export async function getPublicSchoolDetail(schoolId: string): Promise<PublicSchoolDetail> {
   try {
@@ -127,8 +166,7 @@ export async function getPublicSchoolDetail(schoolId: string): Promise<PublicSch
 }
 
 /**
- * List distinct regions for the filter dropdown.
- * Public endpoint — no auth required.
+ * List distinct regions for the filter dropdown
  */
 export async function getPublicRegions(): Promise<string[]> {
   try {
@@ -163,7 +201,6 @@ export async function submitAdmissionApplication(
 
 /**
  * Get an application's status by ID.
- * Public endpoint — no auth required.
  */
 export async function getApplicationStatus(applicationId: string): Promise<AdmissionApplication> {
   try {
@@ -177,7 +214,6 @@ export async function getApplicationStatus(applicationId: string): Promise<Admis
 
 /**
  * Withdraw a pending application.
- * Public endpoint — no auth required.
  */
 export async function withdrawApplication(applicationId: string): Promise<{ message: string }> {
   try {
