@@ -8,7 +8,7 @@ export function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-background">
       {/* Decorative background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#0B6B4F]/5 via-transparent to-akoma-gold/5" />
+      <div className="absolute inset-0 bg-linear-to-br from-[#0B6B4F]/5 via-transparent to-akoma-gold/5" />
       <div className="absolute top-20 right-20 w-96 h-96 bg-akoma-gold/10 rounded-full blur-3xl" />
       <div className="absolute bottom-20 left-20 w-80 h-80 bg-[#0B6B4F]/10 rounded-full blur-3xl" />
 
@@ -30,25 +30,28 @@ export function HeroSection() {
             </h1>
 
             <p className="text-lg text-text-secondary max-w-lg leading-relaxed">
-              Akoma Edu is a digital education infrastructure that connects students, 
+              Akoma Edu is a digital education infrastructure that connects students,
               parents, teachers, schools, and government across Ghana.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/apply/school">
+              <Link href="/register/school">
                 <Button className="bg-[#0B6B4F] hover:bg-akoma-dark text-white px-8 py-6 text-base rounded-full group transition-all duration-300 hover:shadow-lg">
                   Get Started
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
               <Link href="/login">
-                <Button variant="outline" className="px-8 py-6 text-base rounded-full border-2 border-[#0B6B4F] text-[#0B6B4F] hover:bg-[#0B6B4F]/5">
+                <Button
+                  variant="outline"
+                  className="px-8 py-6 text-base rounded-full border-2 border-[#0B6B4F] text-[#0B6B4F] hover:bg-[#0B6B4F]/5"
+                >
                   Sign In
                 </Button>
               </Link>
             </div>
 
-            {/* Stats - Dark text on light background */}
+            {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-8 border-t border-gray-200">
               <div>
                 <p className="text-2xl font-bold text-[#0B6B4F]">10+</p>
@@ -69,7 +72,7 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Right Content - Illustration */}
+          {/* Right Content — Illustration */}
           <div className="relative flex justify-center lg:justify-end">
             <div className="relative w-full max-w-lg">
               {/* Main card */}
@@ -109,7 +112,10 @@ export function HeroSection() {
                     <span className="font-semibold text-[#0B6B4F]">94%</span>
                   </div>
                   <div className="w-full h-2 bg-background rounded-full mt-2 overflow-hidden">
-                    <div className="h-full bg-[#0B6B4F] rounded-full" style={{ width: '94%' }} />
+                    <div
+                      className="h-full bg-[#0B6B4F] rounded-full"
+                      style={{ width: '94%' }}
+                    />
                   </div>
                 </div>
               </div>
@@ -129,7 +135,10 @@ export function HeroSection() {
                 </div>
               </div>
 
-              <div className="absolute -bottom-6 -left-6 animate-float" style={{ animationDelay: '1.5s' }}>
+              <div
+                className="absolute -bottom-6 -left-6 animate-float"
+                style={{ animationDelay: '1.5s' }}
+              >
                 <div className="bg-white rounded-2xl shadow-lg p-4 border border-gray-100">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-[#0B6B4F]/10 flex items-center justify-center">
